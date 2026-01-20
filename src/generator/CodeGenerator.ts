@@ -9,6 +9,7 @@ interface GeneratorContext {
   setupCode: string[];
   loopCode: string[];
   nodeOutputs: Map<string, string>; // Maps node:output to variable/expression
+  classInstances: Map<string, string>; // Maps className to instanceName
 }
 
 export function generateArduinoCode(
@@ -23,7 +24,11 @@ export function generateArduinoCode(
     setupCode: [],
     loopCode: [],
     nodeOutputs: new Map(),
+    classInstances: new Map(),
   };
+
+  // Process class instances (detect which classes need instances)
+  processClassInstances(context);
 
   // Process variable nodes first (for global declarations)
   processVariableNodes(context);
@@ -72,6 +77,33 @@ export function generateArduinoCode(
     });
 
   return assembleCode(context);
+}
+
+function processClassInstances(context: GeneratorContext): void {
+  const { nodes } = context;
+
+  // Find all nodes that use class methods (functionName contains '.')
+  nodes
+    .filter((n) => n.data.nodeType === 'function' && n.data.functionName.includes('.'))
+    .forEach((node) => {
+      console.log('Found method node:', node.data.functionName);
+      const functionName = node.data.functionName;
+      const dotIndex = functionName.indexOf('.');
+      const className = functionName.substring(0, dotIndex);
+
+      // Check if we already have an instance for this class
+      if (!context.classInstances.has(className)) {
+        // Create instance name (lowercase first letter)
+        const instanceName = className.charAt(0).toLowerCase() + className.slice(1);
+        console.log('Creating instance:', className, '->', instanceName);
+        context.classInstances.set(className, instanceName);
+
+        // Add instance declaration to global variables
+        context.globalVariables.push(`${className} ${instanceName};`);
+      }
+    });
+  
+  console.log('All nodes:', nodes.map(n => ({ type: n.data.nodeType, name: n.data.functionName })));
 }
 
 function processVariableNodes(context: GeneratorContext): void {
@@ -220,8 +252,18 @@ function generateFunctionCall(
     return input.value || getDefaultValue(input.type);
   });
 
-  // Handle method calls (e.g., Serial.println)
-  const call = `${functionName}(${args.join(', ')});`;
+  // Handle method calls - convert ClassName.method to instanceName.method
+  let actualFunctionName = functionName;
+  if (functionName.includes('.')) {
+    const dotIndex = functionName.indexOf('.');
+    const className = functionName.substring(0, dotIndex);
+    const methodName = functionName.substring(dotIndex + 1);
+    const instanceName = context.classInstances.get(className) || className;
+    actualFunctionName = `${instanceName}.${methodName}`;
+    console.log('Converting method call:', functionName, '->', actualFunctionName);
+  }
+
+  const call = `${actualFunctionName}(${args.join(', ')});`;
 
   // If this function has a return value and is connected to something, assign it
   if (node.data.outputs.length > 0) {
@@ -229,8 +271,16 @@ function generateFunctionCall(
       (e) => e.source === node.id && e.sourceHandle === 'output'
     );
     if (hasConsumer) {
-      // Store the expression for later use
-      const expr = `${functionName}(${args.join(', ')})`;
+      // Store the expression for later use with correct instance name
+      let actualFunctionName = functionName;
+      if (functionName.includes('.')) {
+        const dotIndex = functionName.indexOf('.');
+        const className = functionName.substring(0, dotIndex);
+        const methodName = functionName.substring(dotIndex + 1);
+        const instanceName = context.classInstances.get(className) || className;
+        actualFunctionName = `${instanceName}.${methodName}`;
+      }
+      const expr = `${actualFunctionName}(${args.join(', ')})`;
       context.nodeOutputs.set(`${node.id}:output`, expr);
     }
   }
@@ -270,7 +320,17 @@ function buildExpression(
       return input.value || getDefaultValue(input.type);
     });
 
-    return `${functionName}(${args.join(', ')})`;
+    // Handle method calls in expressions
+    let actualFunctionName = functionName;
+    if (functionName.includes('.')) {
+      const dotIndex = functionName.indexOf('.');
+      const className = functionName.substring(0, dotIndex);
+      const methodName = functionName.substring(dotIndex + 1);
+      const instanceName = context.classInstances.get(className) || className;
+      actualFunctionName = `${instanceName}.${methodName}`;
+    }
+
+    return `${actualFunctionName}(${args.join(', ')})`;
   }
 
   return '0';

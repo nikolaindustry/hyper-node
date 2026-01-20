@@ -49,29 +49,29 @@ export default function NodeCanvas() {
         snapGrid={[15, 15]}
         defaultEdgeOptions={{
           type: 'smoothstep',
-          animated: true,
+          style: { stroke: '#94a3b8', strokeWidth: 2 },
         }}
-        className="bg-gray-900"
+        className="bg-white"
       >
         <Background
           variant={BackgroundVariant.Dots}
-          gap={20}
+          gap={24}
           size={1}
-          color="#374151"
+          color="#e2e8f0"
         />
-        <Controls className="bg-gray-800 border-gray-600" />
+        <Controls className="bg-white border-gray-200" />
         <MiniMap
-          className="bg-gray-800 border-gray-600"
+          className="bg-white border-gray-200"
           nodeColor={(node) => {
             switch (node.type) {
               case 'setupLoop':
-                return node.data?.nodeType === 'setup' ? '#15803d' : '#7e22ce';
+                return node.data?.nodeType === 'setup' ? '#d1fae5' : '#ede9fe';
               case 'function':
-                return '#2563eb';
+                return '#e0e7ff';
               case 'variable':
-                return '#ea580c';
+                return '#ffedd5';
               default:
-                return '#6b7280';
+                return '#f3f4f6';
             }
           }}
         />

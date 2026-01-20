@@ -254,42 +254,195 @@ function parseParameters(
   }
 
   const params: FunctionParameter[] = [];
-  const paramParts = paramsStr.split(',');
+  
+  // Smart split that respects template brackets and nested structures
+  const paramParts = smartSplitParameters(paramsStr);
 
   for (const part of paramParts) {
     const trimmed = part.trim();
     if (!trimmed) continue;
 
-    // Parse parameter: type name = defaultValue
-    const paramMatch = trimmed.match(
-      /^(\w+(?:\s+\w+)?(?:\s*\*|\s*&)?)\s+(\w+)(?:\s*=\s*(.+))?$/
-    );
-
-    if (paramMatch) {
-      const type = mapType(paramMatch[1].trim());
-      const name = paramMatch[2];
-      const defaultValue = paramMatch[3]?.trim();
-
-      params.push({
-        name,
-        type,
-        defaultValue,
-      });
-    } else {
-      // Try simpler match (just type)
-      const simpleMatch = trimmed.match(/^(\w+(?:\s+\w+)?(?:\s*\*|\s*&)?)$/);
-      if (simpleMatch) {
-        params.push({
-          name: `arg${params.length}`,
-          type: mapType(simpleMatch[1].trim()),
-        });
-      } else {
-        warnings.push(`Could not parse parameter: ${trimmed}`);
-      }
+    try {
+      const param = parseParameter(trimmed);
+      params.push(param);
+    } catch (error) {
+      warnings.push(`Could not parse parameter: ${trimmed}`);
     }
   }
 
   return params;
+}
+
+/**
+ * Split parameters by commas while respecting template brackets, parentheses, and nested structures
+ */
+function smartSplitParameters(paramsStr: string): string[] {
+  const params: string[] = [];
+  let current = '';
+  let depth = 0; // Track nesting depth of < > and ( )
+  let inString = false;
+  let stringChar = '';
+
+  for (let i = 0; i < paramsStr.length; i++) {
+    const char = paramsStr[i];
+    const prevChar = i > 0 ? paramsStr[i - 1] : '';
+
+    // Handle string literals
+    if ((char === '"' || char === "'") && prevChar !== '\\') {
+      if (!inString) {
+        inString = true;
+        stringChar = char;
+      } else if (char === stringChar) {
+        inString = false;
+      }
+    }
+
+    if (!inString) {
+      // Track depth of nested structures
+      if (char === '<' || char === '(') {
+        depth++;
+      } else if (char === '>' || char === ')') {
+        depth--;
+      }
+
+      // Split on commas only at depth 0
+      if (char === ',' && depth === 0) {
+        params.push(current.trim());
+        current = '';
+        continue;
+      }
+    }
+
+    current += char;
+  }
+
+  if (current.trim()) {
+    params.push(current.trim());
+  }
+
+  return params;
+}
+
+/**
+ * Parse a single parameter with support for:
+ * - const/volatile qualifiers
+ * - References (&) and pointers (*)
+ * - Template types (std::vector<int>, std::pair<const char*>)
+ * - Default values (= "value", = 0, = nullptr)
+ * - Complex nested types
+ */
+function parseParameter(paramStr: string): FunctionParameter {
+  // First, extract and remove default value if present
+  let defaultValue: string | undefined;
+  let typeAndName = paramStr;
+
+  const defaultMatch = paramStr.match(/^(.+?)\s*=\s*(.+)$/);
+  if (defaultMatch) {
+    typeAndName = defaultMatch[1].trim();
+    defaultValue = defaultMatch[2].trim();
+  }
+
+  // Normalize whitespace around pointers and references
+  typeAndName = typeAndName.replace(/\s*([*&])\s*/g, ' $1 ');
+  typeAndName = typeAndName.replace(/\s+/g, ' ').trim();
+
+  // Extract parameter name (last word that's not a pointer/reference marker)
+  // Work backwards to find the parameter name
+  const parts = typeAndName.split(/\s+/);
+  let paramName = '';
+  let typeStr = '';
+
+  // Find the parameter name (should be the last valid identifier)
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const part = parts[i];
+    
+    // Skip pointer/reference markers
+    if (part === '*' || part === '&') {
+      continue;
+    }
+
+    // Check if this looks like a variable name (not a type keyword)
+    if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(part) && 
+        !isTypeKeyword(part) && 
+        !paramName) {
+      paramName = part;
+      // Everything before this is the type
+      typeStr = parts.slice(0, i).join(' ');
+      break;
+    }
+  }
+
+  // If we couldn't find a name, the entire thing might be just a type
+  if (!paramName) {
+    paramName = `arg0`;
+    typeStr = typeAndName;
+  }
+
+  // Clean up the type string
+  typeStr = typeStr.trim();
+  
+  // If type string is empty, try to extract from the whole string
+  if (!typeStr) {
+    // This might be a simple type without a name
+    typeStr = typeAndName.replace(paramName, '').trim();
+  }
+
+  const mappedType = mapComplexType(typeStr);
+
+  return {
+    name: paramName,
+    type: mappedType,
+    defaultValue,
+  };
+}
+
+/**
+ * Check if a word is a C++ type keyword or qualifier
+ */
+function isTypeKeyword(word: string): boolean {
+  const keywords = [
+    'const', 'volatile', 'static', 'unsigned', 'signed', 'long', 'short',
+    'struct', 'class', 'enum', 'typename', 'template'
+  ];
+  return keywords.includes(word);
+}
+
+/**
+ * Map complex C++ types including templates to Arduino types
+ */
+function mapComplexType(cppType: string): ArduinoType {
+  // Remove const, volatile, static qualifiers
+  let cleanType = cppType
+    .replace(/\bconst\b/g, '')
+    .replace(/\bvolatile\b/g, '')
+    .replace(/\bstatic\b/g, '')
+    .trim();
+
+  // Handle template types - extract base type
+  const templateMatch = cleanType.match(/^([\w:]+)\s*<.*>/);
+  if (templateMatch) {
+    const baseType = templateMatch[1];
+    
+    // Common template types
+    if (baseType.includes('vector') || baseType.includes('list') || baseType.includes('array')) {
+      return 'any'; // Array-like types
+    }
+    if (baseType.includes('pair') || baseType.includes('tuple')) {
+      return 'any'; // Pair/tuple types
+    }
+    if (baseType.includes('initializer_list')) {
+      return 'any'; // Initializer list
+    }
+    if (baseType.includes('string') || baseType === 'String') {
+      return 'String';
+    }
+  }
+
+  // Remove namespace qualifiers (std::, arduino::, etc.)
+  cleanType = cleanType.replace(/\w+::/g, '');
+
+  // Now use the existing mapType function
+  return mapType(cleanType);
 }
 
 function mapType(cppType: string): ArduinoType {

@@ -1,0 +1,418 @@
+{
+  "name": "Arduino",
+  "displayName": "Arduino Core",
+  "includeStatement": "",
+  "isCore": true,
+  "category": "Core",
+  "constants": [
+    { "name": "HIGH", "value": "1", "type": "int" },
+    { "name": "LOW", "value": "0", "type": "int" },
+    { "name": "INPUT", "value": "0", "type": "int" },
+    { "name": "OUTPUT", "value": "1", "type": "int" },
+    { "name": "INPUT_PULLUP", "value": "2", "type": "int" },
+    { "name": "LED_BUILTIN", "value": "13", "type": "int" }
+  ],
+  "functions": [
+    {
+      "name": "pinMode",
+      "returnType": "void",
+      "category": "Digital I/O",
+      "description": "Configures the specified pin to behave either as an input or an output",
+      "parameters": [
+        { "name": "pin", "type": "uint8_t" },
+        { "name": "mode", "type": "uint8_t" }
+      ]
+    },
+    {
+      "name": "digitalWrite",
+      "returnType": "void",
+      "category": "Digital I/O",
+      "description": "Write a HIGH or LOW value to a digital pin",
+      "parameters": [
+        { "name": "pin", "type": "uint8_t" },
+        { "name": "value", "type": "uint8_t" }
+      ]
+    },
+    {
+      "name": "digitalRead",
+      "returnType": "int",
+      "category": "Digital I/O",
+      "description": "Reads the value from a specified digital pin",
+      "parameters": [
+        { "name": "pin", "type": "uint8_t" }
+      ]
+    },
+    {
+      "name": "analogRead",
+      "returnType": "int",
+      "category": "Analog I/O",
+      "description": "Reads the value from the specified analog pin",
+      "parameters": [
+        { "name": "pin", "type": "uint8_t" }
+      ]
+    },
+    {
+      "name": "analogWrite",
+      "returnType": "void",
+      "category": "Analog I/O",
+      "description": "Writes an analog value (PWM wave) to a pin",
+      "parameters": [
+        { "name": "pin", "type": "uint8_t" },
+        { "name": "value", "type": "int" }
+      ]
+    },
+    {
+      "name": "analogReference",
+      "returnType": "void",
+      "category": "Analog I/O",
+      "description": "Configures the reference voltage used for analog input",
+      "parameters": [
+        { "name": "type", "type": "uint8_t" }
+      ]
+    },
+    {
+      "name": "delay",
+      "returnType": "void",
+      "category": "Time",
+      "description": "Pauses the program for the amount of time (in milliseconds)",
+      "parameters": [
+        { "name": "ms", "type": "unsigned long" }
+      ]
+    },
+    {
+      "name": "delayMicroseconds",
+      "returnType": "void",
+      "category": "Time",
+      "description": "Pauses the program for the amount of time (in microseconds)",
+      "parameters": [
+        { "name": "us", "type": "unsigned long" }
+      ]
+    },
+    {
+      "name": "millis",
+      "returnType": "unsigned long",
+      "category": "Time",
+      "description": "Returns the number of milliseconds since the Arduino board began running",
+      "parameters": []
+    },
+    {
+      "name": "micros",
+      "returnType": "unsigned long",
+      "category": "Time",
+      "description": "Returns the number of microseconds since the Arduino board began running",
+      "parameters": []
+    },
+    {
+      "name": "tone",
+      "returnType": "void",
+      "category": "Advanced I/O",
+      "description": "Generates a square wave of the specified frequency on a pin",
+      "parameters": [
+        { "name": "pin", "type": "uint8_t" },
+        { "name": "frequency", "type": "unsigned long" }
+      ]
+    },
+    {
+      "name": "noTone",
+      "returnType": "void",
+      "category": "Advanced I/O",
+      "description": "Stops the generation of a square wave triggered by tone()",
+      "parameters": [
+        { "name": "pin", "type": "uint8_t" }
+      ]
+    },
+    {
+      "name": "pulseIn",
+      "returnType": "unsigned long",
+      "category": "Advanced I/O",
+      "description": "Reads a pulse on a pin",
+      "parameters": [
+        { "name": "pin", "type": "uint8_t" },
+        { "name": "value", "type": "uint8_t" }
+      ]
+    },
+    {
+      "name": "shiftOut",
+      "returnType": "void",
+      "category": "Advanced I/O",
+      "description": "Shifts out a byte of data one bit at a time",
+      "parameters": [
+        { "name": "dataPin", "type": "uint8_t" },
+        { "name": "clockPin", "type": "uint8_t" },
+        { "name": "bitOrder", "type": "uint8_t" },
+        { "name": "value", "type": "uint8_t" }
+      ]
+    },
+    {
+      "name": "shiftIn",
+      "returnType": "uint8_t",
+      "category": "Advanced I/O",
+      "description": "Shifts in a byte of data one bit at a time",
+      "parameters": [
+        { "name": "dataPin", "type": "uint8_t" },
+        { "name": "clockPin", "type": "uint8_t" },
+        { "name": "bitOrder", "type": "uint8_t" }
+      ]
+    },
+    {
+      "name": "map",
+      "returnType": "long",
+      "category": "Math",
+      "description": "Re-maps a number from one range to another",
+      "parameters": [
+        { "name": "value", "type": "long" },
+        { "name": "fromLow", "type": "long" },
+        { "name": "fromHigh", "type": "long" },
+        { "name": "toLow", "type": "long" },
+        { "name": "toHigh", "type": "long" }
+      ]
+    },
+    {
+      "name": "constrain",
+      "returnType": "long",
+      "category": "Math",
+      "description": "Constrains a number to be within a range",
+      "parameters": [
+        { "name": "x", "type": "long" },
+        { "name": "a", "type": "long" },
+        { "name": "b", "type": "long" }
+      ]
+    },
+    {
+      "name": "min",
+      "returnType": "long",
+      "category": "Math",
+      "description": "Calculates the minimum of two numbers",
+      "parameters": [
+        { "name": "x", "type": "long" },
+        { "name": "y", "type": "long" }
+      ]
+    },
+    {
+      "name": "max",
+      "returnType": "long",
+      "category": "Math",
+      "description": "Calculates the maximum of two numbers",
+      "parameters": [
+        { "name": "x", "type": "long" },
+        { "name": "y", "type": "long" }
+      ]
+    },
+    {
+      "name": "abs",
+      "returnType": "long",
+      "category": "Math",
+      "description": "Calculates the absolute value of a number",
+      "parameters": [
+        { "name": "x", "type": "long" }
+      ]
+    },
+    {
+      "name": "pow",
+      "returnType": "double",
+      "category": "Math",
+      "description": "Calculates the value of a number raised to a power",
+      "parameters": [
+        { "name": "base", "type": "double" },
+        { "name": "exponent", "type": "double" }
+      ]
+    },
+    {
+      "name": "sqrt",
+      "returnType": "double",
+      "category": "Math",
+      "description": "Calculates the square root of a number",
+      "parameters": [
+        { "name": "x", "type": "double" }
+      ]
+    },
+    {
+      "name": "random",
+      "returnType": "long",
+      "category": "Random",
+      "description": "Generates a pseudo-random number",
+      "parameters": [
+        { "name": "max", "type": "long" }
+      ]
+    },
+    {
+      "name": "randomSeed",
+      "returnType": "void",
+      "category": "Random",
+      "description": "Initializes the pseudo-random number generator",
+      "parameters": [
+        { "name": "seed", "type": "unsigned long" }
+      ]
+    },
+    {
+      "name": "attachInterrupt",
+      "returnType": "void",
+      "category": "Interrupts",
+      "description": "Specifies a named Interrupt Service Routine (ISR) to call",
+      "parameters": [
+        { "name": "interrupt", "type": "uint8_t" },
+        { "name": "ISR", "type": "void" },
+        { "name": "mode", "type": "int" }
+      ]
+    },
+    {
+      "name": "detachInterrupt",
+      "returnType": "void",
+      "category": "Interrupts",
+      "description": "Turns off the given interrupt",
+      "parameters": [
+        { "name": "interrupt", "type": "uint8_t" }
+      ]
+    },
+    {
+      "name": "noInterrupts",
+      "returnType": "void",
+      "category": "Interrupts",
+      "description": "Disables interrupts",
+      "parameters": []
+    },
+    {
+      "name": "interrupts",
+      "returnType": "void",
+      "category": "Interrupts",
+      "description": "Re-enables interrupts after noInterrupts()",
+      "parameters": []
+    }
+  ],
+  "classes": [
+    {
+      "name": "Serial",
+      "description": "Serial communication",
+      "constructors": [],
+      "methods": [
+        {
+          "name": "begin",
+          "returnType": "void",
+          "category": "Serial",
+          "description": "Sets the data rate in bits per second (baud)",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": [
+            { "name": "speed", "type": "long" }
+          ]
+        },
+        {
+          "name": "end",
+          "returnType": "void",
+          "category": "Serial",
+          "description": "Disables serial communication",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": []
+        },
+        {
+          "name": "available",
+          "returnType": "int",
+          "category": "Serial",
+          "description": "Returns the number of bytes available to read",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": []
+        },
+        {
+          "name": "read",
+          "returnType": "int",
+          "category": "Serial",
+          "description": "Reads incoming serial data",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": []
+        },
+        {
+          "name": "peek",
+          "returnType": "int",
+          "category": "Serial",
+          "description": "Returns the next byte without removing it from the buffer",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": []
+        },
+        {
+          "name": "print",
+          "returnType": "void",
+          "category": "Serial",
+          "description": "Prints data to the serial port as human-readable ASCII text",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": [
+            { "name": "val", "type": "any" }
+          ]
+        },
+        {
+          "name": "println",
+          "returnType": "void",
+          "category": "Serial",
+          "description": "Prints data to the serial port followed by a carriage return and newline",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": [
+            { "name": "val", "type": "any" }
+          ]
+        },
+        {
+          "name": "write",
+          "returnType": "int",
+          "category": "Serial",
+          "description": "Writes binary data to the serial port",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": [
+            { "name": "val", "type": "uint8_t" }
+          ]
+        },
+        {
+          "name": "flush",
+          "returnType": "void",
+          "category": "Serial",
+          "description": "Waits for the transmission of outgoing serial data to complete",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": []
+        },
+        {
+          "name": "setTimeout",
+          "returnType": "void",
+          "category": "Serial",
+          "description": "Sets the maximum milliseconds to wait for serial data",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": [
+            { "name": "timeout", "type": "long" }
+          ]
+        },
+        {
+          "name": "readString",
+          "returnType": "String",
+          "category": "Serial",
+          "description": "Reads characters from the serial buffer into a String",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": []
+        },
+        {
+          "name": "parseInt",
+          "returnType": "long",
+          "category": "Serial",
+          "description": "Returns the first valid integer from the serial buffer",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": []
+        },
+        {
+          "name": "parseFloat",
+          "returnType": "float",
+          "category": "Serial",
+          "description": "Returns the first valid floating point number from the serial buffer",
+          "isMethod": true,
+          "className": "Serial",
+          "parameters": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "name": "Servo",
+  "displayName": "Servo Library",
+  "includeStatement": "#include <Servo.h>",
+  "isCore": false,
+  "category": "Motor Control",
+  "constants": [],
+  "functions": [],
+  "classes": [
+    {
+      "name": "Servo",
+      "description": "Controls RC servo motors",
+      "constructors": [
+        {
+          "name": "Servo",
+          "returnType": "void",
+          "category": "Servo",
+          "description": "Creates a Servo object",
+          "isMethod": false,
+          "className": "Servo",
+          "parameters": []
+        }
+      ],
+      "methods": [
+        {
+          "name": "attach",
+          "returnType": "uint8_t",
+          "category": "Servo",
+          "description": "Attach the Servo variable to a pin",
+          "isMethod": true,
+          "className": "Servo",
+          "parameters": [
+            { "name": "pin", "type": "int" }
+          ]
+        },
+        {
+          "name": "detach",
+          "returnType": "void",
+          "category": "Servo",
+          "description": "Detach the Servo variable from its pin",
+          "isMethod": true,
+          "className": "Servo",
+          "parameters": []
+        },
+        {
+          "name": "write",
+          "returnType": "void",
+          "category": "Servo",
+          "description": "Writes a value to the servo (0-180 for angle)",
+          "isMethod": true,
+          "className": "Servo",
+          "parameters": [
+            { "name": "value", "type": "int" }
+          ]
+        },
+        {
+          "name": "writeMicroseconds",
+          "returnType": "void",
+          "category": "Servo",
+          "description": "Writes a value in microseconds to the servo",
+          "isMethod": true,
+          "className": "Servo",
+          "parameters": [
+            { "name": "value", "type": "int" }
+          ]
+        },
+        {
+          "name": "read",
+          "returnType": "int",
+          "category": "Servo",
+          "description": "Returns the current angle of the servo (0-180)",
+          "isMethod": true,
+          "className": "Servo",
+          "parameters": []
+        },
+        {
+          "name": "attached",
+          "returnType": "bool",
+          "category": "Servo",
+          "description": "Check whether the Servo variable is attached to a pin",
+          "isMethod": true,
+          "className": "Servo",
+          "parameters": []
+        }
+      ]
+    }
+  ]
+}
